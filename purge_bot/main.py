@@ -37,7 +37,7 @@ def dump_plan(plan: Plan, guild_id: int):
 
 async def add_role(ctx: discord.ApplicationContext, member: discord.Member):
     guild: discord.Guild = ctx.guild
-    role = discord.utils.get(guild.roles, name="Purged")
+    role = discord.utils.get(guild.roles, name="pending")
 
     await member.add_roles(role)
     await ctx.send(f"Added {role} to {member}")
