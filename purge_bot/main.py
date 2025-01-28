@@ -84,10 +84,17 @@ async def list(ctx: discord.ApplicationContext, plan_id: int):
 @bot.slash_command()
 @default_permissions(manage_messages=True)
 async def execute(ctx: discord.ApplicationContext, plan_id: int):
-    await ctx.defer()
-    plan = plans.get(plan_id)
+    if plan_id in current_scans:
+        await ctx.respond("Sorry, I'm still scanning this server.")
+        return
+    
+    plan = plans.get(plan_id, None)
     if not plan:
         await ctx.respond(f"Sorry, I couldn't find a plan with ID {plan_id}")
+        return
+
+    await ctx.defer()
+
     
     for member in plan.to_purge:
         await add_role(ctx, member)
