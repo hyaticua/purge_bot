@@ -5,6 +5,7 @@ import asyncio
 from collections import Counter
 from scanner import Scanner
 from plan import id_generator, Plan
+from discord import default_permissions
 
 import json
 from datetime import datetime
@@ -55,6 +56,7 @@ async def notify_user_on_scan_finished(ctx: discord.ApplicationContext, plan: Pl
     await ctx.send(f"Scan complete! {len(plan.to_purge)} members found to purge. plan ID {plan.plan_id}")
 
 @bot.slash_command()
+@default_permissions(manage_messages=True)
 async def scan(ctx: discord.ApplicationContext):
     if ctx.guild.id in current_scans.values():
         await ctx.respond("Sorry, I'm already scanning this server.")
@@ -68,6 +70,7 @@ async def scan(ctx: discord.ApplicationContext):
     task.add_done_callback(lambda plan: on_scan_finished(ctx, plan.result()))
 
 @bot.slash_command()
+@default_permissions(manage_messages=True)
 async def list(ctx: discord.ApplicationContext, plan_id: int):
     plan = plans.get(plan_id)
     if not plan:
@@ -79,6 +82,7 @@ async def list(ctx: discord.ApplicationContext, plan_id: int):
     await ctx.respond(msg)
 
 @bot.slash_command()
+@default_permissions(manage_messages=True)
 async def execute(ctx: discord.ApplicationContext, plan_id: int):
     await ctx.defer()
     plan = plans.get(plan_id)
