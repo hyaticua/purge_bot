@@ -9,6 +9,7 @@ from discord import default_permissions
 
 import json
 from datetime import datetime
+from utils import send_message
 
 discord_api_key = os.environ.get("DISCORD_API_KEY")
 
@@ -40,7 +41,7 @@ async def add_role(ctx: discord.ApplicationContext, member: discord.Member):
     role = discord.utils.get(guild.roles, name="pending")
 
     await member.add_roles(role)
-    await ctx.send(f"Added {role} to {member}")
+    await send_message(ctx, f"Added {role} to {member}")
 
 
 @bot.event
@@ -53,7 +54,8 @@ def on_scan_finished(ctx: discord.ApplicationContext, plan: Plan):
     bot.loop.create_task(notify_user_on_scan_finished(ctx, plan))
 
 async def notify_user_on_scan_finished(ctx: discord.ApplicationContext, plan: Plan):
-    await ctx.send(f"Scan complete! {len(plan.to_purge)} members found to purge. plan ID {plan.plan_id}")
+    await send_message(ctx, f"Scan complete! {len(plan.to_purge)} members found to purge. plan ID {plan.plan_id}")
+
 
 @bot.slash_command()
 @default_permissions(manage_messages=True)
@@ -72,6 +74,10 @@ async def scan(ctx: discord.ApplicationContext):
 @bot.slash_command()
 @default_permissions(manage_messages=True)
 async def list(ctx: discord.ApplicationContext, plan_id: int):
+    if ctx.guild.id in current_scans.values():
+        await ctx.respond("Sorry, I'm already scanning this server.")
+        return
+    
     plan = plans.get(plan_id)
     if not plan:
         await ctx.respond(f"Sorry, I couldn't find a plan with ID {plan_id}")
