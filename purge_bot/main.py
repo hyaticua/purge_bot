@@ -75,6 +75,7 @@ async def list(ctx: discord.ApplicationContext, plan_id: int):
     plan = plans.get(plan_id)
     if not plan:
         await ctx.respond(f"Sorry, I couldn't find a plan with ID {plan_id}")
+        return
     
     to_purge = [member.name for member in plan.to_purge]
     msg = f"Plan {plan_id} has {len(plan.to_purge)} members to purge:\n"
