@@ -13,6 +13,8 @@ async def get_message_counts(channel_or_thread, count):
                 count[message.author] += 1
     except discord.Forbidden:
         sys.stderr.write(f"Failed to access {channel_or_thread} history\n")
+        return False
+    return True
 
 
 class Scanner:
@@ -31,8 +33,11 @@ class Scanner:
 
         for channel in guild.text_channels:
             await send_message(ctx, f"Scanning channel: {channel}")
-            await get_message_counts(channel, count)
+            has_access = await get_message_counts(channel, count)
 
+            if not has_access:
+                continue
+            
             for thread in channel.threads:
                 try:
                     print(f"Thread: {thread} is_private={thread.is_private()=}")
@@ -63,5 +68,7 @@ class Scanner:
         for member, message_count in count.items():
             if not message_count:
                 plan.add(member)
+
+        print("Scan complete!")
 
         return plan

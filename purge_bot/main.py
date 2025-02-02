@@ -52,14 +52,17 @@ async def on_ready():
 def on_scan_finished(ctx: discord.ApplicationContext, task: Task):
     if task.exception():
         print(f"Task had an exception: {task.exception()}")
+    
+    if not task.result():
         return
     
     plan: Plan = task.result()
     plans[plan.plan_id] = plan
-    current_scans.pop(plan.plan_id)
+    current_scans.pop(ctx.guild_id)
     bot.loop.create_task(notify_user_on_scan_finished(ctx, plan))
 
 async def notify_user_on_scan_finished(ctx: discord.ApplicationContext, plan: Plan):
+    print("notify_user_on_scan_finished")
     await send_message(ctx, f"Scan complete! {len(plan.to_purge)} members found to purge. plan ID {plan.plan_id}")
 
 
