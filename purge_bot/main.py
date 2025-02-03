@@ -93,9 +93,16 @@ async def list(ctx: discord.ApplicationContext, plan_id: int):
         return
     
     to_purge = [member.name for member in plan.to_purge]
+
+    n = 20
+    purge_split = [to_purge[i:i+n] for i in range(0, len(to_purge), n)]
+
     msg = f"Plan {plan_id} has {len(plan.to_purge)} members to purge:\n"
-    msg += "\n".join(to_purge)
+    # msg += "\n".join(to_purge)
+
     await ctx.respond(msg)
+    for purge_list in purge_split:
+        await ctx.followup.send("\n".join(purge_list))
 
 @bot.slash_command()
 @default_permissions(manage_messages=True)
